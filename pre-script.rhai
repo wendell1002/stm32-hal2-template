@@ -366,7 +366,7 @@ hal_dependency += "]";
 
 let rt_suffix = chip.sub_string(5,2);
 let chip_short_family = chip.sub_string(5,4);
-let target_family= target.sub_string(0,6);
+let target_family= target.sub_string(0,7);
  
 
 
