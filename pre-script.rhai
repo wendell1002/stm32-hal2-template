@@ -31,8 +31,7 @@ let flash = switch flash_lit.to_upper() {
 
 let chipfamily = chip.sub_string(0,7);
 let chipserie = chip.sub_string(0,9);
-let rt_suffix = chip.sub_string(6,7);
-let chip_short_family = chip.sub_string(6,9);
+
 let svd_chipserie = chipserie;
 let target;
 let hal;
@@ -365,8 +364,8 @@ if variable::get("defmt_enabled") && has_defmt_feature {
 }
 hal_dependency += "]";
 
-let rt_suffix = chip.sub_string(6,7);
-let chip_short_family = chip.sub_string(6,9);
+let rt_suffix = chip.sub_string(5,2);
+let chip_short_family = chip.sub_string(5,4);
 let target_family= target.sub_string(0,6);
  
 
