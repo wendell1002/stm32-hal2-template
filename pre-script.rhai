@@ -359,9 +359,9 @@ if chipfamily == "stm32l0" {
 if variable::get("rtic") && !(rtic_feature.is_empty()) {
     hal_dependency += `"${rtic_feature}", `
 }
-if variable::get("defmt_enabled") && has_defmt_feature {
-    hal_dependency += "\"defmt\", "
-}
+// if variable::get("defmt_enabled") && has_defmt_feature {
+//     hal_dependency += "\"defmt\", "
+// }
 hal_dependency += "]";
 
 let rt_suffix = chip.sub_string(5,2);
