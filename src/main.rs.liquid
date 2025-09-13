@@ -1,0 +1,118 @@
+#![deny(unsafe_code)]
+#![no_main]
+#![no_std]
+
+use defmt::info;
+use fugit::{Duration, ExtU32};
+use hal::{
+    clocks::Clocks,
+    gpio::{Pin, PinMode, Port},
+     pac,
+};
+
+{% if defmt_enabled %}
+// Print panic message to probe console
+use {defmt_rtt as _, panic_probe as _};
+{% else %}
+// Halt on panic
+use panic_halt as _;
+{% endif  %}
+
+{% if rtic %}
+use rtic::app;
+use rtic_monotonics::systick::prelude::*;
+
+
+systick_monotonic!(Mono, 1000);
+#[app(device =  hal::pac, peripherals = true, dispatchers = [SPI1])]
+mod app {
+
+    use super::*;
+
+    #[shared]
+    struct Shared {}
+
+    #[local]
+    struct Local {
+        led: Pin,
+        state: bool,
+    }
+    #[init]
+    fn init(cx: init::Context) -> (Shared, Local) {
+        // Setup clocks
+        let clock_cfg = Clocks::default();
+        clock_cfg.setup().unwrap();
+        Mono::start(cx.core.SYST, clock_cfg.sysclk());
+
+        let clocks = clock_cfg;
+        info!(
+            "clocks: sysclk={:?} apb1={:?} apb2={:?} hclk={:?}",
+            clocks.sysclk(),
+            clocks.apb1(),
+            clocks.apb2(),
+            clocks.hclk(),
+        );
+
+        let led = {
+            let led = Pin::new(Port::C, 13, PinMode::Output);
+            blinky::spawn().ok();
+            led
+        };
+
+        // let mut adc2 = Adc::new(cx.device.ADC2, &mut rcc);
+        // let adc_ch0: Pin<'A', 0, gpio::Analog> = gpioa.pa0.into_analog(&mut gpioa.crl);
+        (Shared {}, Local { led, state: false })
+    }
+
+    #[task(local = [led, state])]
+    async fn blinky(cx: blinky::Context) {
+        loop {
+            info!("blink");
+            if *cx.local.state {
+                cx.local.led.set_high();
+                *cx.local.state = false;
+            } else {
+                cx.local.led.set_low();
+                *cx.local.state = true;
+            }
+            Mono::delay(1000.millis()).await;
+        }
+    }
+}
+
+{% else %}
+
+use cortex_m::delay::Delay;
+use cortex_m_rt::entry;  
+
+
+
+#[entry]
+fn main() -> ! {
+    let cp = cortex_m::Peripherals::take().unwrap();
+    let dp = pac::Peripherals::take().unwrap();
+    defmt::println!("Hello, world!");
+    let clock_cfg = Clocks::default();
+    clock_cfg.setup().unwrap();
+    let clocks = clock_cfg;
+    info!(
+        "clocks: sysclk={:?} apb1={:?} apb2={:?} hclk={:?}",
+        clocks.sysclk(),
+        clocks.apb1(),
+        clocks.apb2(),
+        clocks.hclk()
+    );
+    let mut delay = Delay::new(cp.SYST, clocks.systick());
+    let mut led = Pin::new(Port::C, 13, PinMode::Output);
+
+    loop {
+        led.set_low();
+        defmt::debug!("Output pin is low.");
+        delay.delay_ms(1_000);
+        led.set_high();
+        defmt::debug!("Output pin is high.");
+        delay.delay_ms(1_000);
+    }
+}
+ 
+{% endif %}
