@@ -17,12 +17,12 @@ rustflags = [
   # "-C", "linker=arm-none-eabi-gcc",
   # "-C", "link-arg=-Wl,-Tlink.x",
   # "-C", "link-arg=-nostartfiles",
-  {% if defmt_enabled %}
+
     "-C",
   "linker=flip-link",
     "-C",
   "link-arg=-Tdefmt.x",
-  {% endif %}
+
 ]
 
 [build]
