@@ -59,8 +59,7 @@ mod app {
             led
         };
 
-        // let mut adc2 = Adc::new(cx.device.ADC2, &mut rcc);
-        // let adc_ch0: Pin<'A', 0, gpio::Analog> = gpioa.pa0.into_analog(&mut gpioa.crl);
+
         (Shared {}, Local { led, state: false })
     }
 
