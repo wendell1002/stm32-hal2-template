@@ -10,43 +10,28 @@ cortex-m = { version = "0.7.6", features = ["critical-section-single-core"] }
 cortex-m-rt = "0.7"
 cortex-m-semihosting = "0.5"
 critical-section = "1.2.0"
-
- 
 fugit = "0.3.6"
-
-
 embedded-hal = { version = "1.0.0", features=["defmt-03"], optional = true }
 embedded-io = { version = "0.6.1", features=["defmt-03"], optional = true }
-
 hal = { package = "stm32-hal2", version = "2.1.4", features = [
     "{{rt_feature}}",
     "{{chip_short_family}}",
     "embedded_hal",
     # "monotonic",
 ] }
-
 defmt = "1.0.1"
 defmt-rtt = "1.0.0"
 panic-probe = { version = "1.0.0", features = ["print-defmt"] }
-
- 
-
 {% if rtic %}
-
 rtic = { version = "2.2.0", features = ["{{target_family}}-backend"] }
 rtic-monotonics = { version = "2.1.0", features = ["cortex-m-systick"] }
 rtic-sync = "1.4.0"
 {% endif %}
 
-
-
 {% if svd %}
- 
 [build-dependencies]
 reqwest = { version = "0.12.23", features = ["blocking"] }
 {% endif %}
-
-
 
 # cargo build/run
 [profile.dev]
